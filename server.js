@@ -1,52 +1,29 @@
+//app dependencies
 let express = require('express');
 let app = express();
-let bodyParser = require('body-parser');
-let assignment = require('./routes/assignments');
 
-let mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
+//routes reference
+let restaurantCRUD = require('./routes/restaurant');
+let Statistics = require('./routes/statistics');
 
-const uri = 'mongodb+srv://02:bestwaifu@cluster0-wzeba.mongodb.net/ventas?retryWrites=true';
-
-const options = {
-  useNewUrlParser: true
-};
-
-mongoose.set('useFindAndModify', false);
-
-mongoose.connect(uri, options)
-  .then(() => {
-    },
-    err => {
-      console.log('connection error: ', err)
-    });
-
+//cors policies
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   next();
 });
-
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
-
+app.use(express.urlencoded({extended: true})); 
+app.use(express.json());
 let port = process.env.PORT || 8010;
 
-const prefix = '/api';
-
-// Assignment API Routes
-app.route(prefix + '/assignments')
-  .get(assignment.getAssignments);
-
-app.route(prefix + '/assignment/:id')
-  .get(assignment.getAssignment)
-  .delete(assignment.deleteAssignment);
+const prefix = '/restaurants';
 
 
-app.route(prefix + '/assignment')
-  .post(assignment.postAssignment)
-  .put(assignment.updateAssignment);
+app.use(prefix, restaurantCRUD);
+
+// Assignment API Routes Statistic
+
 
 // START THE SERVER
 app.listen(port, "0.0.0.0");
